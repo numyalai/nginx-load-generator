@@ -1,0 +1,7 @@
+Requests handled: 440in 300 s
+Mean latency: 0.0 ms
+Transfer rate: 0.0 [Kbytes/sec] received
+Throughput: 1.4666666666666666 requests/second
+
+
+Directly accessing the nginx files.

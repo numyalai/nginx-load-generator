@@ -1,0 +1,7 @@
+Requests handled: 40in 300 s
+Mean latency: 0.0 ms
+Transfer rate: 0.0 [Kbytes/sec] received
+Throughput: 0.13333333333333333 requests/second
+
+
+Load balancer, direct access to nginx

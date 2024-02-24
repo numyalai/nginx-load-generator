@@ -1,0 +1,8 @@
+Requests handled: 25in 300 s
+Mean latency: 169343.48 ms
+Transfer rate: 4.3690666666666664E7 [Kbytes/sec] received
+Throughput: 0.08333333333333333 requests/second
+/second
+
+
+Using load balancer three nginx instances set up
