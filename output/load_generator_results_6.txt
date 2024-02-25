@@ -1,0 +1,4 @@
+Requests handled: 70 in 5 s
+Mean latency: 0.0 ms
+Transfer rate: 0.0 [Kbytes/sec] received
+Throughput: 14.0 requests/second

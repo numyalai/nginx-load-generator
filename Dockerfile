@@ -8,5 +8,6 @@ RUN mvn package
 
 FROM openjdk:17
 COPY --from=build /usr/app/target/nginx-demo-jar-with-dependencies.jar /app/runner.jar
+WORKDIR /output
 ENTRYPOINT ["java", "-Xmx1964m","-jar", "/app/runner.jar"]
 CMD ["tail", "-f", "/dev/null"]

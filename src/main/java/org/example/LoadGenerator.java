@@ -129,7 +129,7 @@ public class LoadGenerator {
         AtomicLong totalLatency = new AtomicLong();
         AtomicLong transferRate = new AtomicLong();
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("load_generator_results_6.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("output/load_generator_results_6.txt"))) {
             while (System.currentTimeMillis() - startTime < testDurationSeconds * 1000) {
                 for (int i = 0; i < concurrencyLevel; i++) {
                     Thread thread = new Thread(() -> {
