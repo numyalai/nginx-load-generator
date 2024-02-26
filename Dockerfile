@@ -7,7 +7,9 @@ RUN mvn package
 
 FROM openjdk:17
 COPY --from=build /usr/app/target/nginx-demo-jar-with-dependencies.jar /app/runner.jar
+COPY keep_running.sh /keep_running.sh
+RUN chmod +x /keep_running.sh
 RUN mkdir -p /output
 WORKDIR /
 
-ENTRYPOINT ["java", "-Xmx1964m","-jar", "/app/runner.jar"]
+ENTRYPOINT ["/keep_running.sh" ]
