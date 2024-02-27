@@ -27,7 +27,7 @@ public class LoadGenerator {
         runLoadGenerator(url, concurrencyLevel, testDurationSeconds);
     }
 
-    private static void runWithHttpConnection(long startTime, BufferedWriter writer, AtomicLong requestsHandled, String url)
+    private static void runWithHttpConnection(long startTime, BufferedWriter writer, AtomicLong requestsHandled,  AtomicLong totalLatency, AtomicLong transferRate, String url)
     {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -35,23 +35,26 @@ public class LoadGenerator {
             connection.setConnectTimeout(5000); // Adjust timeout as needed
             connection.setReadTimeout(5000); // Adjust timeout as needed
 
+            long requestStartTime = System.currentTimeMillis();
+
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String contentType = connection.getHeaderField("Content-Type");
-                System.out.println(contentType);
                 try (InputStream inputStream = connection.getInputStream()) {
                     System.out.println("Request completed. Status code: " + responseCode);
-                    long endTime = System.currentTimeMillis();
-
-                    byte[] responseBodyBytes = inputStream.readAllBytes();
-
-                    // Measure the size of the response body
-                    int responseBodySize = responseBodyBytes.length;
-
-                    System.out.println("Response body size: " + responseBodySize + " bytes");
+                    long requestEndTime = System.currentTimeMillis();
 
                     // Record latency
-                    long latency = System.currentTimeMillis() - startTime;
+                    long latency = requestEndTime - requestStartTime;
+                    totalLatency.addAndGet(latency);
+
+                    byte[] responseBodyBytes = inputStream.readAllBytes();
+                    int responseBodySize = responseBodyBytes.length;
+                    double bytesPerSecond = responseBodySize / ((requestEndTime - requestStartTime) / 1000.0);
+                    transferRate.addAndGet((long) bytesPerSecond);
+                    System.out.println("Response body size: " + responseBodySize + " bytes");
+
+
 //                    writer.write("Latency: " + latency + " ms\n");
                     writer.flush();
                     requestsHandled.getAndIncrement();
@@ -75,7 +78,7 @@ public class LoadGenerator {
             while (System.currentTimeMillis() - startTime < testDurationSeconds * 1000) {
                 for (int i = 0; i < concurrencyLevel; i++) {
                     Thread thread = new Thread(() -> {
-                        runWithHttpConnection(startTime, writer, requestsHandled, url);
+                        runWithHttpConnection(startTime, writer, requestsHandled, totalLatency, transferRate, url);
                     });
                     thread.start();
                     thread.join(); // Wait for the spawned thread to finish to control concurrency
