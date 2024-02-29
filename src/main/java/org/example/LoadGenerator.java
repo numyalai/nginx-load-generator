@@ -89,7 +89,7 @@ public class LoadGenerator {
 
         List<Thread> threads = new ArrayList<>();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("output/load_generator_results.csv"))) {
-            writer.write("Iteration,ConcurrencyLevel,RequestsHandled,MeanLatency (ms),TransferRate (Kbytes/sec),Throughput (requests/second),Iteration_execution_time,Benchmark_Name\n");
+            writer.write("Iteration,ConcurrencyLevel,RequestsHandled,MeanLatency (ms),TransferRate (Kbytes/sec),Throughput (requests/second),Iteration_execution_time, Total_Experiment_Duration,Benchmark_Name\n");
 
             int iteration = 1;
             int concurrencyLevel = initialConcurrency;
@@ -121,7 +121,7 @@ public class LoadGenerator {
                 double throughput = formatDecimal((double) totalRequests / iterationTimeSeconds );
                 double meanTransferRateKBs = formatDecimal((double) transferRate.sum() / iterationTimeSeconds);
 
-                writer.write(iteration + "," + concurrencyLevel + "," + totalRequests + "," + meanLatency + "," + meanTransferRateKBs + "," + throughput + "," + iterationTimeSeconds + "," + benchMarkName + "\n");
+                writer.write(iteration + "," + concurrencyLevel + "," + totalRequests + "," + meanLatency + "," + meanTransferRateKBs + "," + throughput + "," + iterationTimeSeconds + "," + testDurationSeconds + "," +benchMarkName + "\n");
                 iteration++;
                 totalLatency.reset();
                 transferRate.reset();
