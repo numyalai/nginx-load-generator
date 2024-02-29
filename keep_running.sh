@@ -1,5 +1,5 @@
 #!/bin/bash
-java -Xmx1964m -jar /app/runner.jar "$@" &
+java -Xmx4g -jar /app/runner.jar "$@" &
 while true; do
     sleep 3600
 done
