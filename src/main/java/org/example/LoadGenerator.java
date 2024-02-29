@@ -127,8 +127,12 @@ public class LoadGenerator {
                 transferRate.reset();
                 requestsHandled.set(0);
 
-                if (currentSeconds % rampUpIntervalSeconds == 0 && concurrencyLevel < maxConcurrency) {
-                    concurrencyLevel++;
+                if (currentSeconds % rampUpIntervalSeconds == 0) {
+                    if (initialConcurrency > maxConcurrency && concurrencyLevel > maxConcurrency) {
+                        concurrencyLevel--;
+                    } else if (maxConcurrency > initialConcurrency && concurrencyLevel < maxConcurrency) {
+                        concurrencyLevel++;
+                    }
                 }
             }
 
