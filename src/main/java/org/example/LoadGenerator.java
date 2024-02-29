@@ -35,7 +35,7 @@ public class LoadGenerator {
         runLoadGenerator(url, initialConcurrencyLevel, maxConcurrencyLevel, testDurationSeconds, rampUpIntervalSeconds, benchMarkName);
     }
 
-    private static void runWithHttpConnection(long startTime, BufferedWriter writer, AtomicLong requestsHandled,  LongAdder totalLatency, LongAdder transferRate, String url)
+    private static void runWithHttpConnection(long startTime, BufferedWriter writer, AtomicLong requestsHandled, AtomicLong unsuccessfullRequests, LongAdder totalLatency, LongAdder transferRate, String url)
     {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -64,6 +64,7 @@ public class LoadGenerator {
                     requestsHandled.getAndIncrement();
                 }
             } else {
+                unsuccessfullRequests.getAndIncrement();
                 System.out.println("Error: non-success response code: " + responseCode);
             }
 
@@ -86,10 +87,10 @@ public class LoadGenerator {
         AtomicLong requestsHandled = new AtomicLong();
         LongAdder totalLatency =  new LongAdder();
         LongAdder transferRate = new LongAdder();
-
+        AtomicLong unsuccessfullRequests = new AtomicLong();
         List<Thread> threads = new ArrayList<>();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("output/load_generator_results.csv"))) {
-            writer.write("Iteration,ConcurrencyLevel,RequestsHandled,MeanLatency (ms),TransferRate (Kbytes/sec),Throughput (requests/second),Iteration_execution_time, Total_Experiment_Duration,Benchmark_Name\n");
+            writer.write("Iteration,ConcurrencyLevel,RequestsHandled,unsuccessfullRequests,MeanLatency (ms),TransferRate (Kbytes/sec),Throughput (requests/second),Iteration_execution_time, Total_Experiment_Duration,Benchmark_Name\n");
 
             int iteration = 1;
             int concurrencyLevel = initialConcurrency;
@@ -102,7 +103,7 @@ public class LoadGenerator {
 
                 for (int i = 0; i < concurrencyLevel; i++) {
                     Thread thread = new Thread(() -> {
-                        runWithHttpConnection(startTime, writer, requestsHandled, totalLatency, transferRate, url);
+                        runWithHttpConnection(startTime, writer, requestsHandled, unsuccessfullRequests, totalLatency, transferRate, url);
                     });
                     threads.add(thread);
                     thread.start();
@@ -121,7 +122,7 @@ public class LoadGenerator {
                 double throughput = formatDecimal((double) totalRequests / iterationTimeSeconds );
                 double meanTransferRateKBs = formatDecimal((double) transferRate.sum() / iterationTimeSeconds);
 
-                writer.write(iteration + "," + concurrencyLevel + "," + totalRequests + "," + meanLatency + "," + meanTransferRateKBs + "," + throughput + "," + iterationTimeSeconds + "," + testDurationSeconds + "," +benchMarkName + "\n");
+                writer.write(iteration + "," + concurrencyLevel + "," + totalRequests + "," + unsuccessfullRequests + "," + meanLatency + "," + meanTransferRateKBs + "," + throughput + "," + iterationTimeSeconds + "," + testDurationSeconds + "," +benchMarkName + "\n");
                 iteration++;
                 totalLatency.reset();
                 transferRate.reset();
